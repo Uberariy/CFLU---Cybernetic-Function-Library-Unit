@@ -40,7 +40,7 @@ TEST(Function_test, Factory) {
     ASSERT_EQ(typeid(*E1), typeid(E2));
 }
 
-TEST(Function_test, FunctionSemantics) {
+TEST(Function_test, FunctionSemanticsORString) {
     FunctionFactory F;
 
     auto A1 = F.Create("polynomial", {0, 2});

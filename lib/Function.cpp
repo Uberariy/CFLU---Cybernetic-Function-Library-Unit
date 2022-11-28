@@ -18,6 +18,33 @@
 //     return lop.ToString() == rop.ToString();
 // }
 
+double GoldenSelection(Compose& f2, double grad, double x, double eps, double a, double b) {
+    const double fi = 1.6180339887;
+    double x1, x2, y1, y2;
+
+    x1 = b - ((b - a) / fi);
+    x2 = b + ((b - a) / fi);
+    y1 = f2(x - x1 * grad);
+    y2 = f2(x - x2 * grad);
+
+    while (std::abs(b - a) > eps) {
+        if (y1 <= y2) {
+            b = x2;
+            x2 = x1;
+            x1 = b - ((b - a) / fi);
+            y2 = y1;
+            y1 = f2(x - x1 * grad);
+        } else {
+            a = x1;
+            x1 = x2;
+            x2 = a + ((b - a) / fi);
+            y1 = y2;
+            y2 = f2(x - x2 * grad);  
+        }
+    }
+    return (a + b) / 2;
+}
+
 Compose::Compose(BaseFunction& lop_, BaseFunction& rop_, std::string type_) :
     lop(lop_.Copy()), rop(rop_.Copy()), type(type_) {}
 
@@ -30,6 +57,8 @@ double Compose::Deriative(double x) {
         return ((*lop).Deriative(x) * (*rop)(x) + (*rop).Deriative(x) * (*lop)(x));
     } else if (type == "/") {
         return ((*lop).Deriative(x) * (*rop)(x) - (*rop).Deriative(x) * (*lop)(x)) / ((*rop)(x) * (*rop)(x));
+    } else {
+        throw std::logic_error("No such type!");
     }
 }
 
@@ -42,6 +71,8 @@ double Compose::operator()(double x) {
         return (*lop)(x) * (*rop)(x);
     } else if (type == "/") {
         return (*lop)(x) / (*rop)(x);
+    } else {
+        throw std::logic_error("No such type!");
     }
 }
 
@@ -54,6 +85,8 @@ std::string Compose::ToString() const {
         return "(" + (*lop).ToString() + ") * (" + (*rop).ToString() + ")";
     } else if (type == "/") {
         return "(" + (*lop).ToString() + ") / (" + (*rop).ToString() + ")";
+    } else {
+        throw std::logic_error("No such type!");
     }
 }
 
@@ -112,7 +145,8 @@ double Polynomial::Deriative(double x) {
 double Polynomial::operator()(double x) {
     double res = 0;
     for (auto & [key, val]: PolyDict) {
-        res += val * pow(x, key);
+        if (val != 0)
+            res += val * pow(x, key);
     }
     return res;
 }

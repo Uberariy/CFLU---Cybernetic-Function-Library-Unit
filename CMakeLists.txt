@@ -14,9 +14,9 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 set(Function lib/Factory.hpp lib/Function.hpp lib/Function.cpp)
-set(Operations lib/Factory.hpp lib/Function.hpp lib/Function.cpp)
+# set(Operations lib/Factory.hpp lib/Function.hpp lib/Function.cpp)
 
-add_library(CFLU ${Function} ${Operations})
+add_library(CFLU ${Function})# ${Operations})
 
 add_executable(test lib/test/Function_test.cpp lib/test/Operations_test.cpp)
 target_link_libraries(test CFLU)

@@ -11,6 +11,7 @@
 
 #include "gtest/gtest.h"
 #include <iostream>
+#include <math.h>
 
 #include "../Factory.hpp"
 
@@ -49,4 +50,38 @@ TEST(Function_test, Deriation) {
     ASSERT_EQ(p.Deriative(1), 53);
     ASSERT_THROW(*f + "abc", std::logic_error);
     ASSERT_EQ(f->Deriative(3), 6);
+
+    /* Other */
+
+    auto k = F.Create("exp", 2);
+    ASSERT_EQ((*k).Deriative(2), ((*k) + (*k))(2));
+    ASSERT_EQ((*k).Deriative(20), ((*k) + (*k))(20));
+}
+
+TEST(Function_test, RootSearch) {
+    FunctionFactory F;
+
+    auto f = F.Create("ident", 1);
+    ASSERT_EQ(FindRoot((*f), 2), 0);
+    auto g = F.Create("polynomial", {4, -1});
+    ASSERT_EQ(std::round(FindRoot((*g), 1000, -10)), 4);
+    auto p = F.Create("polynomial", {1, 0, -1});
+    ASSERT_EQ(std::round(FindRoot((*p), 20, -2)), -1);
+    ASSERT_EQ(std::round(FindRoot((*p), 20, 2)), 1);
+    auto h = F.Create("polynomial", {8, 0, 0, -1});
+    ASSERT_EQ(std::round(FindRoot((*h), 1000, 2)), 2);
+
+}
+
+TEST(Function_test, LogicError) {
+    FunctionFactory F;
+
+    auto A1 = F.Create("polynomial", {0, 2});
+    ASSERT_THROW(*A1 + "abc", std::logic_error);
+    ASSERT_THROW(*A1 + A1, std::logic_error);
+
+    auto A2 = F.Create("ident", 2);
+    auto A3 = *A1 + *A2;
+    ASSERT_THROW(A3 + "abc", std::logic_error);
+    ASSERT_THROW(A3 + A1, std::logic_error);
 }
